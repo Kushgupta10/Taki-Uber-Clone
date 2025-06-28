@@ -13,13 +13,11 @@ const rideRoutes = require('./routes/ride.routes');
 
 connectToDb();
 
-const corsOptions = {
-    origin: process.env.FRONTEND_URL,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-};
+const cors = require("cors");
 
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: "https://taki-uber-clone-4orzbtxnd-kush-guptas-projects.vercel.app"
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
 app.use(cookieParser());
