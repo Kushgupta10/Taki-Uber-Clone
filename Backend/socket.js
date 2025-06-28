@@ -6,10 +6,10 @@ let io;
 
 function initializeSocket(server) {
     io = socketIo(server, {
-        cors: {
-            origin: '*',
-            methods: [ 'GET', 'POST' ]
-        }
+      cors: {
+  origin: "https://taki-uber-clone.vercel.app",
+  methods: ["GET", "POST"]
+}
     });
 
     io.on('connection', (socket) => {
