@@ -16,8 +16,9 @@ connectToDb();
 const cors = require("cors");
 
 app.use(cors({
-  origin: "https://taki-uber-clone-4orzbtxnd-kush-guptas-projects.vercel.app"
+  origin: "https://taki-uber-clone.vercel.app"  
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
 app.use(cookieParser());
