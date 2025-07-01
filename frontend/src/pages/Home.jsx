@@ -62,36 +62,52 @@ const Home = () => {
     })
 
 
-  const handlePickupChange = async (e) => {
-        setPickup(e.target.value)
-        try {
-            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-suggestions`, {
-                params: { input: e.target.value },
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
+ const handlePickupChange = async (e) => {
+    const input = e.target.value;
+    setPickup(input);
 
-            })
-            setPickupSuggestions(response.data)
-        } catch {
-           
-        }
+    const trimmedInput = input.trim();
+    if (trimmedInput.length < 3) {
+        setPickupSuggestions([]); // Optionally clear suggestions
+        return;
     }
 
-    const handleDestinationChange = async (e) => {
-        setDestination(e.target.value)
-        try {
-            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-suggestions`, {
-                params: { input: e.target.value },
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            })
-            setDestinationSuggestions(response.data)
-        } catch {
-            
-        }
+    try {
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-suggestions`, {
+            params: { input: trimmedInput },
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+        setPickupSuggestions(response.data);
+    } catch (error) {
+        console.error("Pickup suggestions error:", error);
     }
+};
+
+const handleDestinationChange = async (e) => {
+    const input = e.target.value;
+    setDestination(input);
+
+    const trimmedInput = input.trim();
+    if (trimmedInput.length < 3) {
+        setDestinationSuggestions([]); // Optionally clear suggestions
+        return;
+    }
+
+    try {
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-suggestions`, {
+            params: { input: trimmedInput },
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+        setDestinationSuggestions(response.data);
+    } catch (error) {
+        console.error("Destination suggestions error:", error);
+    }
+};
+
 
   const submitHandler = (e) => {
     e.preventDefault();
