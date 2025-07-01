@@ -14,35 +14,45 @@ module.exports.createRide = async (req, res) => {
     const { userId, pickup, destination, vehicleType } = req.body;
 
     try {
+        console.log('REQ.USER:', req.user); // Check if auth worked
+        console.log('BODY:', { pickup, destination, vehicleType });
+
         const ride = await rideService.createRide({ user: req.user._id, pickup, destination, vehicleType });
-        res.status(201).json(ride);
+        console.log('RIDE CREATED:', ride);
 
         const pickupCoordinates = await mapService.getAddressCoordinate(pickup);
+        console.log('COORDINATES:', pickupCoordinates);
 
+        const captainsInRadius = await mapService.getCaptainsInTheRadius(
+            pickupCoordinates.ltd,
+            pickupCoordinates.lng,
+            2
+        );
+        console.log('CAPTAINS:', captainsInRadius);
 
-
-        const captainsInRadius = await mapService.getCaptainsInTheRadius(pickupCoordinates.ltd, pickupCoordinates.lng, 2);
-
-        ride.otp = ""
+        ride.otp = ""; // optional: consider ride.save()
 
         const rideWithUser = await rideModel.findOne({ _id: ride._id }).populate('user');
+        console.log('RIDE WITH USER:', rideWithUser);
 
-        captainsInRadius.map(captain => {
+        captainsInRadius.forEach(captain => {
+            if (captain.socketId) {
+                sendMessageToSocketId(captain.socketId, {
+                    event: 'new-ride',
+                    data: rideWithUser
+                });
+            } else {
+                console.warn('Missing captain socketId:', captain);
+            }
+        });
 
-            sendMessageToSocketId(captain.socketId, {
-                event: 'new-ride',
-                data: rideWithUser
-            })
-
-        })
-
+        res.status(201).json(ride);
     } catch (err) {
-
-        console.log(err);
+        console.error('CREATE RIDE ERROR:', err);
         return res.status(500).json({ message: err.message });
     }
-
 };
+
 
 module.exports.getFare = async (req, res) => {
     const errors = validationResult(req);
