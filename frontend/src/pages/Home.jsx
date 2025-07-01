@@ -200,19 +200,19 @@ useGSAP( function() {
     }
     async function createRide() {
     try {
-        console.log({ pickup, destination, vehicleType }); 
+        const token = localStorage.getItem('token');
+console.log("Token being sent:", token); // Log token for debugging
 
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/create`, {
-            pickup,
-            destination,
-            vehicleType
-        }, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-        });
+await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/create`, {
+    pickup,
+    destination,
+    vehicleType
+}, {
+    headers: {
+        Authorization: `Bearer ${token}` 
+    }
+});
 
-        console.log('Ride created:', response.data);
     } catch (err) {
         console.error('Create ride failed:', err.response?.data || err.message);
     }
