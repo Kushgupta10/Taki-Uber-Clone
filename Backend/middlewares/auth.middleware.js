@@ -21,10 +21,10 @@ module.exports.authUser = async (req, res, next) => {
 
    try {
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  console.log('Decoded JWT:', decoded); // 👈 log this
+  console.log('Decoded JWT:', decoded);
 
   const user = await userModel.findById(decoded._id);
-  console.log('Authenticated user:', user); // 👈 log this too
+  console.log('Authenticated user:', user); 
 
   if (!user) {
     return res.status(401).json({ message: 'User not found' });
