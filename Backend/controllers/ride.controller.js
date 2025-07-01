@@ -11,10 +11,16 @@ module.exports.createRide = async (req, res) => {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { userId, pickup, destination, vehicleType } = req.body;
+    const { pickup, destination, vehicleType } = req.body;
 
     try {
-        console.log('REQ.USER:', req.user); // Check if auth worked
+        
+        if (!req.user || !req.user._id) {
+            console.log("❌ req.user is missing or malformed");
+            return res.status(401).json({ message: "User not authenticated" });
+        }
+
+        console.log('REQ.USER:', req.user); 
         console.log('BODY:', { pickup, destination, vehicleType });
 
         const ride = await rideService.createRide({ user: req.user._id, pickup, destination, vehicleType });
@@ -30,7 +36,7 @@ module.exports.createRide = async (req, res) => {
         );
         console.log('CAPTAINS:', captainsInRadius);
 
-        ride.otp = ""; // optional: consider ride.save()
+        ride.otp = ""; 
 
         const rideWithUser = await rideModel.findOne({ _id: ride._id }).populate('user');
         console.log('RIDE WITH USER:', rideWithUser);
@@ -52,6 +58,7 @@ module.exports.createRide = async (req, res) => {
         return res.status(500).json({ message: err.message });
     }
 };
+
 
 
 module.exports.getFare = async (req, res) => {
