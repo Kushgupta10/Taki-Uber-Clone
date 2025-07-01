@@ -19,17 +19,22 @@ module.exports.authUser = async (req, res, next) => {
         return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await userModel.findById(decoded._id)
-       
-        req.user = user;
+   try {
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  console.log('Decoded JWT:', decoded); // 👈 log this
 
-        return next();
+  const user = await userModel.findById(decoded._id);
+  console.log('Authenticated user:', user); // 👈 log this too
 
-    } catch (error) {
-        return res.status(401).json({ message: 'Unauthorized' });
-    }
+  if (!user) {
+    return res.status(401).json({ message: 'User not found' });
+  }
+
+  req.user = user;
+  return next();
+} catch (error) {
+  return res.status(401).json({ message: 'Unauthorized' });
+}
 
 }
 
