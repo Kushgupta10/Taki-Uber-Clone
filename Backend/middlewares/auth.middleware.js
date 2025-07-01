@@ -28,12 +28,14 @@ module.exports.authUser = async (req, res, next) => {
   console.log('Authenticated user:', user); 
 
   if (!user) {
+       console.log("⚠️ User not found for _id in JWT:", decoded._id);
     return res.status(401).json({ message: 'User not found' });
   }
 
   req.user = user;
   return next();
 } catch (error) {
+       console.error("Error decoding token:", error);
   return res.status(401).json({ message: 'Unauthorized' });
 }
 
