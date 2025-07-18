@@ -76,31 +76,40 @@ module.exports.createRide = async ({
     return ride;
 }
 
-module.exports.confirmRide = async ({
-    rideId, captain
-}) => {
-    if (!rideId) {
-        throw new Error('Ride id is required');
+module.exports.confirmRide = async ({ rideId, captain }) => {
+    try {
+        if (!rideId) {
+            throw new Error('Ride id is required');
+        }
+
+        if (!captain || !captain._id) {
+            throw new Error('Captain is required and must include _id');
+        }
+
+        await rideModel.findOneAndUpdate(
+            { _id: rideId },
+            {
+                status: 'accepted',
+                captain: captain._id
+            }
+        );
+
+        const ride = await rideModel.findOne({ _id: rideId })
+            .populate('user')
+            .populate('captain')
+            .select('+otp');
+
+        if (!ride) {
+            throw new Error('Ride not found');
+        }
+
+        return ride;
+    } catch (error) {
+        console.error('Error confirming ride:', error.message);
+        throw error; // Rethrow the error so the controller or caller can handle it
     }
+};
 
-    await rideModel.findOneAndUpdate({
-        _id: rideId
-    }, {
-        status: 'accepted',
-        captain: captain._id
-    })
-
-    const ride = await rideModel.findOne({
-        _id: rideId
-    }).populate('user').populate('captain').select('+otp');
-
-    if (!ride) {
-        throw new Error('Ride not found');
-    }
-
-    return ride;
-
-}
 
 module.exports.startRide = async ({ rideId, otp, captain }) => {
     if (!rideId || !otp) {
